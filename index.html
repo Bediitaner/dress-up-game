@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dress Up Game</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #f0f0f0;
+      margin: 0;
+      padding: 20px;
+    }
+    .button-container {
+      margin-bottom: 10px;
+    }
+    button {
+      margin: 0 5px;
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+    .game-container {
+      position: relative;
+      width: 700px;
+      height: 600px;
+      background-color: white;
+      border: 2px solid #ccc;
+    }
+    #character {
+      position: absolute;
+      left: 250px;
+      top: 100px;
+      z-index: 1;
+      height: 400px;
+    }
+    .item {
+      position: absolute;
+      width: 100px;
+      height: auto;
+      cursor: grab;
+    }
+  </style>
+</head>
+<body>
+  <div class="button-container">
+    <button onclick="switchCharacter('girl')">Girl</button>
+    <button onclick="switchCharacter('boy')">Boy</button>
+  </div>
+
+  <div class="game-container">
+    <img id="character" src="https://yourserver.com/girl.png" alt="Character">
+    <div id="items"></div>
+  </div>
+
+  <script>
+    const container = document.querySelector('.game-container');
+    const itemsContainer = document.getElementById('items');
+
+    const outfits = {
+      girl: [
+        { id: 'hat', src: 'https://yourserver.com/girl_hat.png', top: 20, left: 50 },
+        { id: 'dress', src: 'https://yourserver.com/girl_dress.png', top: 100, right: 50 },
+        { id: 'boots', src: 'https://yourserver.com/girl_boots.png', bottom: 50, right: 50 }
+      ],
+      boy: [
+        { id: 'cap', src: 'https://yourserver.com/boy_cap.png', top: 20, left: 50 },
+        { id: 'shirt', src: 'https://yourserver.com/boy_shirt.png', top: 100, right: 50 },
+        { id: 'shoes', src: 'https://yourserver.com/boy_shoes.png', bottom: 50, right: 50 }
+      ]
+    };
+
+    function switchCharacter(type) {
+      const character = document.getElementById('character');
+      character.src = `https://yourserver.com/${type}.png`;
+
+      itemsContainer.innerHTML = '';
+
+      outfits[type].forEach(item => {
+        const img = document.createElement('img');
+        img.id = item.id;
+        img.src = item.src;
+        img.className = 'item';
+        img.draggable = true;
+
+        if (item.top !== undefined) img.style.top = item.top + 'px';
+        if (item.left !== undefined) img.style.left = item.left + 'px';
+        if (item.right !== undefined) img.style.right = item.right + 'px';
+        if (item.bottom !== undefined) img.style.bottom = item.bottom + 'px';
+
+        itemsContainer.appendChild(img);
+
+        img.addEventListener('dragstart', dragStart);
+      });
+    }
+
+    function dragStart(e) {
+      e.dataTransfer.setData('text/plain', e.target.id);
+    }
+
+    container.addEventListener('dragover', e => e.preventDefault());
+    container.addEventListener('drop', drop);
+
+    function drop(e) {
+      e.preventDefault();
+      const id = e.dataTransfer.getData('text');
+      const el = document.getElementById(id);
+      const rect = container.getBoundingClientRect();
+      el.style.left = (e.clientX - rect.left - el.width / 2) + 'px';
+      el.style.top = (e.clientY - rect.top - el.height / 2) + 'px';
+    }
+
+    // Initialize with girl character
+    switchCharacter('girl');
+  </script>
+</body>
+</html>
