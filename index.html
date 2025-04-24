@@ -51,7 +51,7 @@
   </div>
 
   <div class="game-container">
-    <img id="character" src="https://yourserver.com/girl.png" alt="Character">
+    <img id="character" src="https://yourusername.github.io/dress-up-game/girl.png" alt="Character">
     <div id="items"></div>
   </div>
 
@@ -61,20 +61,20 @@
 
     const outfits = {
       girl: [
-        { id: 'hat', src: 'https://yourserver.com/girl_hat.png', top: 20, left: 50 },
-        { id: 'dress', src: 'https://yourserver.com/girl_dress.png', top: 100, right: 50 },
-        { id: 'boots', src: 'https://yourserver.com/girl_boots.png', bottom: 50, right: 50 }
+        { id: 'hat', src: 'https://yourusername.github.io/dress-up-game/girl_hat.png', top: 20, left: 50 },
+        { id: 'dress', src: 'https://yourusername.github.io/dress-up-game/girl_dress.png', top: 100, right: 50 },
+        { id: 'boots', src: 'https://yourusername.github.io/dress-up-game/girl_boots.png', bottom: 50, right: 50 }
       ],
       boy: [
-        { id: 'cap', src: 'https://yourserver.com/boy_cap.png', top: 20, left: 50 },
-        { id: 'shirt', src: 'https://yourserver.com/boy_shirt.png', top: 100, right: 50 },
-        { id: 'shoes', src: 'https://yourserver.com/boy_shoes.png', bottom: 50, right: 50 }
+        { id: 'cap', src: 'https://yourusername.github.io/dress-up-game/boy_cap.png', top: 20, left: 50 },
+        { id: 'shirt', src: 'https://yourusername.github.io/dress-up-game/boy_shirt.png', top: 100, right: 50 },
+        { id: 'shoes', src: 'https://yourusername.github.io/dress-up-game/boy_shoes.png', bottom: 50, right: 50 }
       ]
     };
 
     function switchCharacter(type) {
       const character = document.getElementById('character');
-      character.src = `https://yourserver.com/${type}.png`;
+      character.src = `https://yourusername.github.io/dress-up-game/${type}.png`;
 
       itemsContainer.innerHTML = '';
 
@@ -113,7 +113,7 @@
     }
 
     // Initialize with girl character
-    switchCharacter('girl');
+    window.onload = () => switchCharacter('girl');
   </script>
 </body>
 </html>
