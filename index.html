@@ -5,116 +5,473 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dress Up Game</title>
   <style>
+    :root {
+      --primary-color: #ff69b4;
+      --secondary-color: #4a86e8;
+      --background-color: #f8f9fa;
+      --light-shadow: rgba(0, 0, 0, 0.1);
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
     body {
-      font-family: sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--background-color);
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      background: #f0f0f0;
-      margin: 0;
       padding: 20px;
     }
-    .button-container {
-      margin-bottom: 10px;
+    
+    .title {
+      color: #333;
+      margin-bottom: 20px;
+      text-align: center;
+      font-size: 2rem;
     }
+    
+    .controls {
+      width: 100%;
+      max-width: 700px;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    
+    .button-container {
+      display: flex;
+      gap: 10px;
+    }
+    
     button {
-      margin: 0 5px;
       padding: 10px 20px;
       font-size: 16px;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: bold;
     }
+    
+    .character-btn.girl {
+      background-color: var(--primary-color);
+      color: white;
+    }
+    
+    .character-btn.boy {
+      background-color: var(--secondary-color);
+      color: white;
+    }
+    
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px var(--light-shadow);
+    }
+    
+    button.active {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px var(--light-shadow);
+    }
+    
+    .reset-btn {
+      background-color: #f44336;
+      color: white;
+    }
+    
     .game-container {
       position: relative;
-      width: 700px;
+      width: 100%;
+      max-width: 700px;
       height: 600px;
       background-color: white;
-      border: 2px solid #ccc;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px var(--light-shadow);
+      overflow: hidden;
     }
-    #character {
+    
+    @media (max-width: 768px) {
+      .game-container {
+        height: 450px;
+      }
+      
+      .title {
+        font-size: 1.5rem;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .game-container {
+        height: 400px;
+      }
+      
+      .controls {
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
+      }
+      
+      button {
+        padding: 8px 16px;
+        font-size: 14px;
+      }
+    }
+    
+    .character-area {
       position: absolute;
-      left: 250px;
-      top: 100px;
-      z-index: 1;
-      height: 400px;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
+    
+    #character {
+      position: relative;
+      height: 80%;
+      max-height: 400px;
+      z-index: 1;
+      transition: all 0.5s ease;
+    }
+    
+    .items-panel {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 120px;
+      background-color: rgba(248, 249, 250, 0.8);
+      backdrop-filter: blur(5px);
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      overflow-y: auto;
+      z-index: 20;
+      box-shadow: 0 0 10px var(--light-shadow);
+      transition: all 0.3s ease;
+    }
+    
+    .items-panel.left {
+      left: 0;
+      border-top-right-radius: 10px;
+      border-bottom-right-radius: 10px;
+    }
+    
+    .items-panel.right {
+      right: 0;
+      border-top-left-radius: 10px;
+      border-bottom-left-radius: 10px;
+    }
+    
+    .item-thumbnail {
+      width: 80px;
+      height: 80px;
+      object-fit: contain;
+      cursor: grab;
+      background-color: white;
+      border-radius: 10px;
+      padding: 5px;
+      box-shadow: 0 2px 5px var(--light-shadow);
+      transition: all 0.2s ease;
+    }
+    
+    .item-thumbnail:hover {
+      transform: scale(1.1);
+    }
+    
     .item {
       position: absolute;
-      width: 100px;
+      max-width: 150px;
       height: auto;
       cursor: grab;
       z-index: 10;
+      transition: all 0.2s ease;
+      filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.2));
+    }
+    
+    .item.active {
+      z-index: 15;
+      outline: 2px dashed var(--primary-color);
+    }
+    
+    @media (max-width: 600px) {
+      .items-panel {
+        width: 80px;
+      }
+      
+      .item-thumbnail {
+        width: 60px;
+        height: 60px;
+      }
+      
+      .item {
+        max-width: 120px;
+      }
+    }
+    
+    .instructions {
+      margin-top: 20px;
+      text-align: center;
+      color: #555;
+      font-size: 0.9rem;
     }
   </style>
 </head>
 <body>
-  <div class="button-container">
-    <button onclick="switchCharacter('girl')">Girl</button>
-    <button onclick="switchCharacter('boy')">Boy</button>
+  <h1 class="title">Dress Up Game</h1>
+  
+  <div class="controls">
+    <div class="button-container">
+      <button id="girlBtn" class="character-btn girl active" onclick="switchCharacter('girl')">Girl</button>
+      <button id="boyBtn" class="character-btn boy" onclick="switchCharacter('boy')">Boy</button>
+    </div>
+    <button class="reset-btn" onclick="resetItems()">Reset Items</button>
   </div>
 
-  <div class="game-container">
-    <img id="character" src="https://bediitaner.github.io/dress-up-game/girl.jpeg" alt="Character">
-    <div id="items"></div>
+  <div class="game-container" id="gameContainer">
+    <div class="character-area">
+      <img id="character" src="https://bediitaner.github.io/dress-up-game/girl.jpeg" alt="Character">
+    </div>
+    
+    <div class="items-panel left" id="leftPanel"></div>
+    <div class="items-panel right" id="rightPanel"></div>
+    
+    <div id="placedItems"></div>
   </div>
+  
+  <p class="instructions">Drag items onto the character to dress them up. Touch and hold on mobile devices.</p>
 
   <script>
-    const container = document.querySelector('.game-container');
-    const itemsContainer = document.getElementById('items');
-
+    const gameContainer = document.getElementById('gameContainer');
+    const leftPanel = document.getElementById('leftPanel');
+    const rightPanel = document.getElementById('rightPanel');
+    const placedItems = document.getElementById('placedItems');
+    const girlBtn = document.getElementById('girlBtn');
+    const boyBtn = document.getElementById('boyBtn');
+    
+    let activeItem = null;
+    let currentCharacter = 'girl';
+    let offsetX, offsetY;
+    let isTouchDevice = 'ontouchstart' in window;
+    
+    // Define item positions relative to the character for better placement
     const outfits = {
       girl: [
-        { id: 'hat', src: 'https://bediitaner.github.io/dress-up-game/girl_hat.png', top: 20, left: 50 },
-        { id: 'dress', src: 'https://bediitaner.github.io/dress-up-game/girl_dress.png', top: 100, right: 50 },
-        { id: 'boots', src: 'https://bediitaner.github.io/dress-up-game/girl_boots.png', bottom: 50, right: 50 }
+        { id: 'hat', src: 'https://bediitaner.github.io/dress-up-game/girl_hat.png', panel: 'left' },
+        { id: 'dress', src: 'https://bediitaner.github.io/dress-up-game/girl_dress.png', panel: 'right' },
+        { id: 'boots', src: 'https://bediitaner.github.io/dress-up-game/girl_boots.png', panel: 'right' }
       ],
       boy: [
-        { id: 'cap', src: 'https://bediitaner.github.io/dress-up-game/boy_cap.png', top: 20, left: 50 },
-        { id: 'shirt', src: 'https://bediitaner.github.io/dress-up-game/boy_shirt.png', top: 100, right: 50 },
-        { id: 'shoes', src: 'https://bediitaner.github.io/dress-up-game/boy_shoes.png', bottom: 50, right: 50 }
+        { id: 'cap', src: 'https://bediitaner.github.io/dress-up-game/boy_cap.png', panel: 'left' },
+        { id: 'shirt', src: 'https://bediitaner.github.io/dress-up-game/boy_shirt.png', panel: 'right' },
+        { id: 'shoes', src: 'https://bediitaner.github.io/dress-up-game/boy_shoes.png', panel: 'right' }
       ]
     };
-
+    
+    function createItemThumbnail(item) {
+      const thumbnail = document.createElement('img');
+      thumbnail.src = item.src;
+      thumbnail.className = 'item-thumbnail';
+      thumbnail.dataset.id = item.id;
+      thumbnail.alt = item.id;
+      
+      if (isTouchDevice) {
+        thumbnail.addEventListener('touchstart', startDragThumbnail, { passive: false });
+      } else {
+        thumbnail.addEventListener('mousedown', startDragThumbnail);
+      }
+      
+      return thumbnail;
+    }
+    
+    function createPlacedItem(id, src, x, y) {
+      const item = document.createElement('img');
+      item.id = id;
+      item.src = src;
+      item.className = 'item';
+      item.style.left = x + 'px';
+      item.style.top = y + 'px';
+      
+      if (isTouchDevice) {
+        item.addEventListener('touchstart', startDragItem, { passive: false });
+      } else {
+        item.addEventListener('mousedown', startDragItem);
+      }
+      
+      placedItems.appendChild(item);
+      return item;
+    }
+    
+    function startDragThumbnail(e) {
+      e.preventDefault();
+      
+      const thumbnailRect = this.getBoundingClientRect();
+      const src = this.src;
+      const id = this.dataset.id + '-' + Date.now(); // Unique ID
+      
+      let clientX, clientY;
+      
+      if (e.type === 'touchstart') {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+      } else {
+        clientX = e.clientX;
+        clientY = e.clientY;
+      }
+      
+      const containerRect = gameContainer.getBoundingClientRect();
+      const x = clientX - containerRect.left - thumbnailRect.width / 2;
+      const y = clientY - containerRect.top - thumbnailRect.height / 2;
+      
+      const newItem = createPlacedItem(id, src, x, y);
+      
+      setTimeout(() => {
+        setActiveItem(newItem);
+        
+        offsetX = thumbnailRect.width / 2;
+        offsetY = thumbnailRect.height / 2;
+        
+        if (isTouchDevice) {
+          moveItem(e.touches[0].clientX, e.touches[0].clientY);
+        } else {
+          moveItem(e.clientX, e.clientY);
+        }
+      }, 0);
+    }
+    
+    function startDragItem(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      setActiveItem(this);
+      
+      const itemRect = this.getBoundingClientRect();
+      
+      let clientX, clientY;
+      
+      if (e.type === 'touchstart') {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+      } else {
+        clientX = e.clientX;
+        clientY = e.clientY;
+      }
+      
+      offsetX = clientX - itemRect.left;
+      offsetY = clientY - itemRect.top;
+    }
+    
+    function moveItem(clientX, clientY) {
+      if (!activeItem) return;
+      
+      const containerRect = gameContainer.getBoundingClientRect();
+      const x = clientX - containerRect.left - offsetX;
+      const y = clientY - containerRect.top - offsetY;
+      
+      // Keep item within container bounds
+      const maxX = containerRect.width - activeItem.offsetWidth;
+      const maxY = containerRect.height - activeItem.offsetHeight;
+      
+      activeItem.style.left = Math.min(Math.max(0, x), maxX) + 'px';
+      activeItem.style.top = Math.min(Math.max(0, y), maxY) + 'px';
+    }
+    
+    function setActiveItem(item) {
+      // Remove active class from previous item
+      if (activeItem) {
+        activeItem.classList.remove('active');
+      }
+      
+      activeItem = item;
+      
+      if (activeItem) {
+        activeItem.classList.add('active');
+        
+        // Move the active item to the top of the z-index stack
+        placedItems.appendChild(activeItem);
+      }
+    }
+    
     function switchCharacter(type) {
+      if (currentCharacter === type) return;
+      
+      currentCharacter = type;
       const character = document.getElementById('character');
       character.src = `https://bediitaner.github.io/dress-up-game/${type}.jpeg`;
-
-      itemsContainer.innerHTML = '';
-
+      
+      // Update active button
+      if (type === 'girl') {
+        girlBtn.classList.add('active');
+        boyBtn.classList.remove('active');
+      } else {
+        boyBtn.classList.add('active');
+        girlBtn.classList.remove('active');
+      }
+      
+      // Reset items
+      resetItems();
+      
+      // Populate item panels
+      leftPanel.innerHTML = '';
+      rightPanel.innerHTML = '';
+      
       outfits[type].forEach(item => {
-        const img = document.createElement('img');
-        img.id = item.id;
-        img.src = item.src;
-        img.className = 'item';
-        img.draggable = true;
-
-        if (item.top !== undefined) img.style.top = item.top + 'px';
-        if (item.left !== undefined) img.style.left = item.left + 'px';
-        if (item.right !== undefined) img.style.right = item.right + 'px';
-        if (item.bottom !== undefined) img.style.bottom = item.bottom + 'px';
-
-        itemsContainer.appendChild(img);
-
-        img.addEventListener('dragstart', dragStart);
+        const thumbnail = createItemThumbnail(item);
+        
+        if (item.panel === 'left') {
+          leftPanel.appendChild(thumbnail);
+        } else {
+          rightPanel.appendChild(thumbnail);
+        }
       });
     }
-
-    function dragStart(e) {
-      e.dataTransfer.setData('text/plain', e.target.id);
+    
+    function resetItems() {
+      placedItems.innerHTML = '';
+      setActiveItem(null);
     }
-
-    container.addEventListener('dragover', e => e.preventDefault());
-    container.addEventListener('drop', drop);
-
-    function drop(e) {
-      e.preventDefault();
-      const id = e.dataTransfer.getData('text');
-      const el = document.getElementById(id);
-      const rect = container.getBoundingClientRect();
-      el.style.left = (e.clientX - rect.left - el.width / 2) + 'px';
-      el.style.top = (e.clientY - rect.top - el.height / 2) + 'px';
+    
+    // Mouse events for the container
+    if (!isTouchDevice) {
+      document.addEventListener('mousemove', (e) => {
+        if (activeItem) {
+          moveItem(e.clientX, e.clientY);
+        }
+      });
+      
+      document.addEventListener('mouseup', () => {
+        setActiveItem(null);
+      });
     }
-
-    // Initialize with girl character
-    window.onload = () => switchCharacter('girl');
+    
+    // Touch events for mobile
+    else {
+      document.addEventListener('touchmove', (e) => {
+        if (activeItem) {
+          e.preventDefault(); // Prevent scrolling while dragging
+          moveItem(e.touches[0].clientX, e.touches[0].clientY);
+        }
+      }, { passive: false });
+      
+      document.addEventListener('touchend', () => {
+        setActiveItem(null);
+      });
+    }
+    
+    // Check if we're on a touch device
+    document.addEventListener('DOMContentLoaded', () => {
+      isTouchDevice = 'ontouchstart' in window;
+      
+      // Initialize with girl character
+      switchCharacter('girl');
+    });
   </script>
 </body>
 </html>
